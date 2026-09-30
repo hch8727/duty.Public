@@ -94,6 +94,7 @@ body.mode-list .list{display:block}
 .note{font-size:12px;color:var(--muted);margin-top:14px}
 .stale{display:none;font-size:13px;padding:8px 12px;margin-bottom:12px;border-radius:8px;background:#fff4e5;color:#8a4b12;border:1px solid #f3d9b6}
 .stale.on{display:block}
+.stale.info{background:var(--today);color:var(--duty);border-color:#c7d7f5;cursor:pointer}
 input,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
 input:focus-visible,textarea:focus-visible{outline:2px solid var(--sat);outline-offset:1px}
 button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -553,6 +554,21 @@ async function openHolidays(){
   $("hList").onclick = e=>{ const b=e.target.closest("button[data-a=del]"); if(!b) return;
     const d=b.closest(".r").dataset.d; if(confirm(d+" 삭제할까요?")) act(()=>admin("holiday_delete",{dates:[d]})); };
   draw();
+}
+
+/* 서비스 워커: 페이지 캐시, 새 버전은 다음 접속에 반영 */
+if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
+  navigator.serviceWorker.register("./sw.js").then(reg=>{
+    reg.addEventListener("updatefound", ()=>{
+      const nw = reg.installing;
+      nw.addEventListener("statechange", ()=>{
+        if(nw.state==="installed" && navigator.serviceWorker.controller){
+          const el = $("stale"); el.className = "stale on info"; el.textContent = "새 버전이 있습니다. 눌러서 새로고침";
+          el.onclick = ()=>location.reload();
+        }
+      });
+    });
+  }).catch(()=>{});
 }
 
 document.getElementById("note").textContent = "";
