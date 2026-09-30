@@ -340,11 +340,20 @@ async function admin(op, payload={}){
   return d;
 }
 function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); if(!on) cancelSwap(); }
-$("editBtn").onclick = async ()=>{
-  const pw = prompt("편집 비밀번호"); if(!pw) return;
-  PW = pw;
-  try{ ROLE=(await admin("verify")).role; sessionStorage.setItem("duty:pw",pw); setEditing(true); }
-  catch(e){ PW=""; alert(e.message); }
+$("editBtn").onclick = ()=>{
+  openModal(`<h3>편집 모드</h3>
+    <div class="f"><label>비밀번호</label><input type="password" id="pwIn" autocomplete="current-password" inputmode="text"></div>
+    <p class="hint" id="pwMsg" style="min-height:1.2em;margin:0"></p>
+    <div class="actions"><span class="sp"></span><button id="pwCancel">취소</button><button class="pri" id="pwOk">들어가기</button></div>`);
+  const inp=$("pwIn"); setTimeout(()=>inp.focus(),50);
+  const go = async ()=>{
+    const pw=inp.value; if(!pw) return;
+    $("pwOk").disabled=true; $("pwMsg").textContent="확인 중…"; PW=pw;
+    try{ ROLE=(await admin("verify")).role; sessionStorage.setItem("duty:pw",pw); closeModal(); setEditing(true); }
+    catch(e){ PW=""; $("pwMsg").textContent=e.message; $("pwMsg").style.color="var(--sun)"; $("pwOk").disabled=false; inp.select(); }
+  };
+  $("pwOk").onclick=go; $("pwCancel").onclick=closeModal;
+  inp.onkeydown=e=>{ if(e.key==="Enter") go(); };
 };
 $("exitBtn").onclick = ()=>{ PW=""; sessionStorage.removeItem("duty:pw"); setEditing(false); };
 if(PW) admin("verify").then(d=>{ ROLE=d.role; setEditing(true); }).catch(()=>{ PW=""; sessionStorage.removeItem("duty:pw"); });
@@ -515,7 +524,13 @@ async function openMembers(){
   $("mList").onclick = e=>{
     const b=e.target.closest("button[data-a]"); if(!b) return;
     const name=b.closest(".r").dataset.n, i=list.findIndex(x=>x.name===name), a=b.dataset.a;
-    if(a==="ren"){ const nn=prompt("새 이름", name); if(nn&&nn.trim()!==name) act(()=>admin("member_update",{name,new_name:nn})); }
+    if(a==="ren"){
+      const row=b.closest(".r"), nm=row.querySelector(".nm");
+      nm.innerHTML=`<input value="${esc(name)}" style="width:100%">`; const inp=nm.querySelector("input"); inp.focus(); inp.select();
+      const done=async(save)=>{ const nn=inp.value.trim(); if(save&&nn&&nn!==name) await act(()=>admin("member_update",{name,new_name:nn})); else draw(); };
+      inp.onkeydown=e=>{ if(e.key==="Enter") done(true); if(e.key==="Escape") done(false); };
+      inp.onblur=()=>done(true);
+    }
     if(a==="tog"){ act(()=>admin("member_update",{name,active:!list[i].active})); }
     if(a==="up"||a==="down"){ const names=list.map(x=>x.name), j=a==="up"?i-1:i+1; [names[i],names[j]]=[names[j],names[i]]; act(()=>admin("member_sort",{names})); }
   };
