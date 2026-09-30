@@ -292,7 +292,7 @@ function renderList(byDate){
     return `<div class="row${cls(r.date,r)}" data-date="${r.date}">
       <div class="dt">${d.getMonth()+1}.${d.getDate()} ${WD[d.getDay()]}<small>${HOLIDAY[r.date]||""}</small></div>
       <div>${r.duty?`<span class="tag d${filterName===r.duty?" on":""}">${r.duty}</span>`:"—"}</div>
-      <div>${r.meeting?`<span class="tag m${filterName===r.meeting?" on":""}">${r.meeting}</span>`:"<span style='color:var(--muted)'>회의 없음</span>"}</div>
+      <div>${r.meeting?`<span class="tag m${filterName===r.meeting?" on":""}">${r.meeting}</span>`:"<span style='color:var(--muted);font-size:13px'>회의 없음</span>"}</div>
       ${r.note?`<div class="memo">${r.note}</div>`:""}</div>`;
   }).join("");
 }
