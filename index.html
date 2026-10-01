@@ -163,8 +163,8 @@ body.editing .cell.today:hover,body.editing .row.today:hover{background:var(--to
 .modal .f > span{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
 .modal .f > span > input:not([type=date]):not([type=checkbox]){flex:1;min-width:0;width:auto}
 .modal .f > span > button{flex:none;white-space:nowrap}
-.modal .f label label{display:inline-flex;align-items:center;gap:6px}
-.modal .f input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--duty)}
+.modal .f label:has(input[type=checkbox]){display:inline-flex;align-items:center;gap:6px;line-height:1}
+.modal .f input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--duty);position:relative;top:0}
 .modal .actions{display:flex;gap:8px;margin-top:16px;align-items:center}
 .modal .actions button{flex:none;white-space:nowrap}
 .modal .actions .hint{flex:1;min-width:0}
