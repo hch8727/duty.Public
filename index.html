@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -7,19 +7,20 @@
 <title>당직일정표 - IT전략부</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("duty:theme")||"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
 <style>
 :root{
-  --bg:#f4f5f7;--panel:#fff;--ink:#1a1f2b;--muted:#6b7280;--line:#dfe3e8;--line2:#eceff3;--we:#fafbfc;--head:#f6f7f9;
+  --bg:#f4f5f7;--panel:#fff;--ink:#1a1f2b;--muted:#6b7280;--line:#dfe3e8;--line2:#eceff3;--we:#fafbfc;--head:#f6f7f9;--hover:#f7f8fa;--edge:#c7d7f5;--meet-strong:#b45309;
   --duty:#2563eb;--meet:#f59e0b;--meet-ink:#4f5660;--hl:#fff1c2;
   --sun:#d9534f;--sat:#4c6ef5;--today:#eff4ff;
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#15171c;--panel:#1d2026;--ink:#ecedef;--muted:#9aa0ab;--line:#2d313a;
-  --line2:#262a32;--we:#1a1d23;--head:#1a1d23;--duty:#6b9cff;--meet:#f0b44c;--meet-ink:#b6bcc6;--hl:#3d3418;--sun:#f08a7e;--sat:#9bb6ee;--today:#1e2740;}}
+  --line2:#262a32;--we:#1a1d23;--head:#1a1d23;--hover:#262a32;--edge:#2d3a5c;--meet-strong:#f0b44c;--duty:#6b9cff;--meet:#f0b44c;--meet-ink:#b6bcc6;--hl:#3d3418;--sun:#f08a7e;--sat:#9bb6ee;--today:#1e2740;}}
 :root[data-theme="dark"]{
   --bg:#15171c;--panel:#1d2026;--ink:#ecedef;--muted:#9aa0ab;--line:#2d313a;
-  --line2:#262a32;--we:#1a1d23;--head:#1a1d23;--duty:#6b9cff;--meet:#f0b44c;--meet-ink:#b6bcc6;--hl:#3d3418;--sun:#f08a7e;--sat:#9bb6ee;--today:#1e2740;}
+  --line2:#262a32;--we:#1a1d23;--head:#1a1d23;--hover:#262a32;--edge:#2d3a5c;--meet-strong:#f0b44c;--duty:#6b9cff;--meet:#f0b44c;--meet-ink:#b6bcc6;--hl:#3d3418;--sun:#f08a7e;--sat:#9bb6ee;--today:#1e2740;}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;line-height:1.5}
@@ -33,7 +34,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Vari
 .todaybox .who span{display:flex;flex-direction:column;gap:2px}
 .todaybox .who b{font-size:22px;font-weight:800;line-height:1.2}
 .todaybox .who small{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.02em}
-.todaybox .who .d b{color:var(--duty)} .todaybox .who .m b{color:#b45309}
+.todaybox .who .d b{color:var(--duty)} .todaybox .who .m b{color:var(--meet-strong)}
 .todaybox .memo{width:100%;font-size:15px;color:var(--muted);margin-top:2px}
 
 /* 툴바 */
@@ -67,7 +68,7 @@ select:focus-visible{outline:2px solid var(--meet);outline-offset:2px}
 .cal .h:first-child{color:var(--sun)} .cal .h:last-child{color:var(--sat)}
 .cell{background:var(--panel);min-height:112px;padding:10px 12px;position:relative;display:flex;flex-direction:column;gap:6px}
 .cell.sun,.cell.sat{background:var(--we)}
-.cell.out{background:var(--head)} .cell.out .n{color:#b5bac3}
+.cell.out{background:var(--head)} .cell.out .n{color:var(--muted);opacity:.5}
 .cell .n{font-size:14px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px;min-height:24px}
 .cell.sun .n,.cell.hol .n{color:var(--sun)} .cell.sat .n{color:var(--sat)}
 .cell .n em{font-style:normal;font-weight:400;font-size:11px;color:var(--sun)}
@@ -98,9 +99,9 @@ body.mode-list .list{display:block}
 
 .empty{padding:40px;text-align:center;color:var(--muted)}
 .note{font-size:12px;color:var(--muted);margin-top:14px}
-.stale{display:none;font-size:13px;padding:8px 12px;margin-bottom:12px;border-radius:8px;background:#fff4e5;color:#8a4b12;border:1px solid #f3d9b6}
+.stale{display:none;font-size:13px;padding:8px 12px;margin-bottom:12px;border-radius:8px;background:var(--today);color:var(--meet-strong);border:1px solid var(--edge)}
 .stale.on{display:block}
-.stale.info{background:var(--today);color:var(--duty);border-color:#c7d7f5;cursor:pointer}
+.stale.info{background:var(--today);color:var(--duty);border-color:var(--edge);cursor:pointer}
 input,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
 input:focus-visible,textarea:focus-visible{outline:2px solid var(--sat);outline-offset:1px}
 button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -118,18 +119,18 @@ body.swapping .swap-hint{display:flex;gap:10px;align-items:center}
 table.prev td.ch{color:var(--muted)}
 table.notice{width:100%;border-collapse:collapse;font-size:14px;border:1px solid var(--line)}
 table.notice th,table.notice td{border:1px solid var(--line);padding:9px 12px;text-align:center;vertical-align:middle}
-table.notice th{background:#f7f8fa;font-weight:600}
-table.notice td:first-child{background:#f7f8fa;font-weight:600}
+table.notice th{background:var(--head);font-weight:600}
+table.notice td:first-child{background:var(--head);font-weight:600}
 table.notice .em{color:var(--duty);font-weight:600}
 #editBtn{color:var(--duty);border-color:var(--duty);background:var(--today)}
 #editBtn:hover{background:var(--duty);color:#fff}
-.edit-bar{background:var(--today);border:1px solid #c7d7f5;border-radius:8px;padding:3px 4px}
+.edit-bar{background:var(--today);border:1px solid var(--edge);border-radius:8px;padding:3px 4px}
 .edit-bar button{border:0;background:none;color:var(--duty);font-weight:600}
-.edit-bar button:hover{background:#fff}
-.edit-bar #exitBtn{color:var(--muted);font-weight:400;border-left:1px solid #c7d7f5;border-radius:0;padding-left:12px}
+.edit-bar button:hover{background:var(--panel)}
+.edit-bar #exitBtn{color:var(--muted);font-weight:400;border-left:1px solid var(--edge);border-radius:0;padding-left:12px}
 body.role-team .edit-bar #exitBtn{border-left:0;padding-left:12px;border-radius:6px}
 body.editing .cell:not(.out),body.editing .row{cursor:pointer}
-body.editing .cell:not(.out):hover,body.editing .row:hover{background:#f7f8fa}
+body.editing .cell:not(.out):hover,body.editing .row:hover{background:var(--hover)}
 body.editing .cell.today:hover,body.editing .row.today:hover{background:var(--today)}
 .modal-bg{position:fixed;inset:0;background:rgba(20,25,35,.45);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
 .modal-bg.on{display:flex}
@@ -185,6 +186,7 @@ table.prev .chg td:last-child{font-weight:700}
       <button id="viewCal" role="tab" class="on">달력</button>
       <button id="viewList" role="tab">목록</button>
     </div>
+    <button id="themeBtn" aria-label="테마 전환" title="다크/라이트" style="padding:6px 9px;margin-left:4px"></button>
   </div>
   <div class="legend"><span class="d"><i></i>당직</span><span class="m"><i></i>회의 참석</span></div>
 
@@ -576,6 +578,11 @@ async function openHolidays(){
     const d=b.closest(".r").dataset.d; if(confirm(d+" 삭제할까요?")) act(()=>admin("holiday_delete",{dates:[d]})); };
   draw();
 }
+
+/* 테마 */
+function applyTheme(t){ document.documentElement.dataset.theme=t; $("themeBtn").textContent = t==="dark"?"☀":"☾"; try{localStorage.setItem("duty:theme",t)}catch(e){} }
+applyTheme(document.documentElement.dataset.theme||"light");
+$("themeBtn").onclick = ()=>applyTheme(document.documentElement.dataset.theme==="dark"?"light":"dark");
 
 /* 서비스 워커: 페이지 캐시, 새 버전은 다음 접속에 반영 */
 if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
