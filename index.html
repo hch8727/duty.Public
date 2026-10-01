@@ -395,10 +395,10 @@ try{ setMode(localStorage.getItem("duty-mode") || (innerWidth<640?"list":"cal"))
 /* ---------- 편집 ---------- */
 const $ = id => document.getElementById(id);
 const esc = v => String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let PW = sessionStorage.getItem("duty:pw") || "", ROLE = "";
+let PW = "", TOKEN = sessionStorage.getItem("duty:token") || "", ROLE = "";
 async function admin(op, payload={}){
   const r = await fetch(`${SUPABASE_URL}/functions/v1/${ADMIN_FN}`,{method:"POST",
-    headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"x-admin-pw":PW},
+    headers:{"Content-Type":"application/json","apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,...(TOKEN?{"x-admin-token":TOKEN}:{"x-admin-pw":PW})},
     body:JSON.stringify({op,...payload})});
   const d = await r.json().catch(()=>({}));
   if(!r.ok) throw new Error(d.error||("HTTP "+r.status));
@@ -413,15 +413,15 @@ $("editBtn").onclick = ()=>{
   const inp=$("pwIn"); setTimeout(()=>inp.focus(),50);
   const go = async ()=>{
     const pw=inp.value; if(!pw) return;
-    $("pwOk").disabled=true; $("pwMsg").textContent="확인 중…"; PW=pw;
-    try{ ROLE=(await admin("verify")).role; sessionStorage.setItem("duty:pw",pw); closeModal(); setEditing(true); }
+    $("pwOk").disabled=true; $("pwMsg").textContent="확인 중…"; PW=pw; TOKEN="";
+    try{ const d=await admin("verify"); ROLE=d.role; TOKEN=d.token; PW=""; sessionStorage.setItem("duty:token",TOKEN); closeModal(); setEditing(true); }
     catch(e){ PW=""; $("pwMsg").textContent=e.message; $("pwMsg").style.color="var(--sun)"; $("pwOk").disabled=false; inp.select(); }
   };
   $("pwOk").onclick=go; $("pwCancel").onclick=closeModal;
   inp.onkeydown=e=>{ if(e.key==="Enter") go(); };
 };
-$("exitBtn").onclick = ()=>{ PW=""; sessionStorage.removeItem("duty:pw"); setEditing(false); };
-if(PW) admin("verify").then(d=>{ ROLE=d.role; setEditing(true); }).catch(()=>{ PW=""; sessionStorage.removeItem("duty:pw"); });
+$("exitBtn").onclick = ()=>{ TOKEN=""; sessionStorage.removeItem("duty:token"); setEditing(false); };
+if(TOKEN) admin("verify").then(d=>{ ROLE=d.role; TOKEN=d.token; sessionStorage.setItem("duty:token",TOKEN); setEditing(true); }).catch(()=>{ TOKEN=""; sessionStorage.removeItem("duty:token"); });
 
 const modalBg = $("modalBg"), modal = $("modal");
 function openModal(html, wide){ modal.className = "modal"+(wide?" wide":""); modal.innerHTML = html; modalBg.classList.add("on"); }
