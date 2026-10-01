@@ -295,6 +295,7 @@ const WD = ["일","월","화","수","목","금","토"];
 const TODAY = ymd(new Date());
 let cur = new Date(); cur.setDate(1);
 let filterName = null, mode = "cal", rows = [], cache = {};
+try{ filterName = localStorage.getItem("duty:me") || null; }catch(e){}
 
 /* ---------- 렌더 ---------- */
 async function render(){
@@ -346,6 +347,7 @@ function renderList(byDate){
 }
 function renderFilter(){
   const names = MEMBERS.length ? MEMBERS : [...new Set(rows.flatMap(r=>[r.duty,r.meeting]).filter(Boolean))];
+  if(filterName && MEMBERS.length && !names.includes(filterName)){ filterName=null; try{localStorage.removeItem("duty:me")}catch(e){} }
   document.getElementById("filter").innerHTML = `<option value="">전체 인원</option>` +
     names.map(n=>`<option value="${n}"${filterName===n?" selected":""}>${n}</option>`).join("");
 }
@@ -358,14 +360,28 @@ async function renderToday(){
     <div class="who">
       <span class="d"><small>당직</small><b>${r.duty||"미정"}</b></span>
       <span class="m"><small>회의 참석</small><b>${r.meeting||"없음"}</b></span>
-    </div>${r.note?`<div class="memo">${r.note}</div>`:""}`;
+    </div>${r.note?`<div class="memo">${r.note}</div>`:""}<div class="memo" id="nextLine"></div>`;
+  renderNext();
+}
+async function renderNext(){
+  const el = $("nextLine"); if(!el) return;
+  if(!filterName){ el.textContent=""; return; }
+  try{
+    const { data } = await sb.from("duty").select("date,duty,meeting").gt("date",TODAY)
+      .or(`duty.eq.${filterName},meeting.eq.${filterName}`).order("date").limit(2);
+    const items = (data||[]).map(r=>{ const d=new Date(r.date+"T00:00"); const what=[r.duty===filterName?"당직":null,r.meeting===filterName?"회의":null].filter(Boolean).join("·");
+      return `${d.getMonth()+1}/${d.getDate()}(${WD[d.getDay()]}) ${what}`; });
+    el.textContent = items.length ? `${filterName} 다음 일정: ${items.join(", ")}` : `${filterName} 예정된 일정 없음`;
+  }catch(e){ el.textContent=""; }
 }
 
 /* ---------- 이벤트 ---------- */
 document.getElementById("prev").onclick = ()=>{cur.setMonth(cur.getMonth()-1);render();};
 document.getElementById("next").onclick = ()=>{cur.setMonth(cur.getMonth()+1);render();};
 document.getElementById("goToday").onclick = ()=>{cur=new Date();cur.setDate(1);render();};
-document.getElementById("filter").onchange = e=>{ filterName = e.target.value || null; render(); };
+document.getElementById("filter").onchange = e=>{ filterName = e.target.value || null;
+  try{ filterName ? localStorage.setItem("duty:me",filterName) : localStorage.removeItem("duty:me"); }catch(e){}
+  render(); renderNext(); };
 document.getElementById("viewCal").onclick = ()=>setMode("cal");
 document.getElementById("viewList").onclick = ()=>setMode("list");
 function setMode(m){
