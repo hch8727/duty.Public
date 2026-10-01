@@ -153,6 +153,9 @@ body.editing .cell.today:hover,body.editing .row.today:hover{background:var(--to
 .modal-bg.on{display:flex}
 .modal{background:var(--panel);border-radius:12px;width:100%;max-width:520px;max-height:90vh;overflow:auto;padding:20px 22px}
 .modal.wide{max-width:780px}
+.modal-bg.confirm{z-index:11}
+.modal-bg.confirm .modal{max-width:360px}
+.modal-bg.confirm button.pri.danger{background:var(--sun);border-color:var(--sun);color:#fff}
 .modal h3{margin:0 0 16px;font-size:17px}
 .modal .f{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;margin-bottom:10px;font-size:14px}
 .modal .f select,.modal .f input:not([type=checkbox]),.modal .f textarea{width:100%}
@@ -221,6 +224,10 @@ table.prev .chg td:last-child{font-weight:700}
   <p class="note" id="note"></p>
 </div>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog"></div></div>
+<div class="modal-bg confirm" id="confirmBg"><div class="modal" role="alertdialog">
+  <p id="confirmMsg" style="margin:4px 0 0;font-size:15px"></p>
+  <div class="actions"><span class="sp"></span><button id="confirmNo">취소</button><button class="pri" id="confirmYes">확인</button></div>
+</div></div>
 
 <script>
 /* ---------- 데이터 계층 ---------- */
@@ -395,8 +402,18 @@ if(PW) admin("verify").then(d=>{ ROLE=d.role; setEditing(true); }).catch(()=>{ P
 const modalBg = $("modalBg"), modal = $("modal");
 function openModal(html, wide){ modal.className = "modal"+(wide?" wide":""); modal.innerHTML = html; modalBg.classList.add("on"); }
 function closeModal(){ modalBg.classList.remove("on"); }
+function ask(msg, {ok="확인", danger=false}={}){
+  return new Promise(res=>{
+    const bg=$("confirmBg"); $("confirmMsg").textContent=msg;
+    const y=$("confirmYes"); y.textContent=ok; y.className="pri"+(danger?" danger":"");
+    bg.classList.add("on"); y.focus();
+    const done=v=>{ bg.classList.remove("on"); bg.onclick=null; res(v); };
+    y.onclick=()=>done(true); $("confirmNo").onclick=()=>done(false);
+    bg.onclick=e=>{ if(e.target===bg) done(false); };
+  });
+}
 modalBg.onclick = e=>{ if(e.target===modalBg) closeModal(); };
-document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeModal(); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape"){ if($("confirmBg").classList.contains("on")) $("confirmNo").click(); else closeModal(); } });
 async function refresh(){ cache = {}; await Promise.all([loadMembers(), loadHolidays()]); await renderToday(); await render(); }
 async function run(fn){ try{ if(await fn()===false) return; closeModal(); await refresh(); }catch(e){ alert("저장 실패: "+e.message); } }
 
@@ -414,7 +431,7 @@ function openDay(date){
   $("eCancel").onclick = closeModal;
   if($("eSwap")) $("eSwap").onclick = ()=>openSwap(date);
   $("eSave").onclick = ()=>run(()=>admin("upsert_duty",{rows:[{date,duty:$("eDuty").value||null,meeting:$("eMeet").value||null,note:$("eNote").value}]}));
-  if($("eDel")) $("eDel").onclick = ()=>run(async()=>{ if(!confirm("이 날짜의 당직·회의·메모를 모두 지울까요?")) return false; await admin("delete_duty",{dates:[date]}); });
+  if($("eDel")) $("eDel").onclick = ()=>run(async()=>{ if(!await ask("이 날짜의 당직·회의·메모를 모두 지울까요?",{ok:"비우기",danger:true})) return false; await admin("delete_duty",{dates:[date]}); });
 }
 function onPick(date){
   if(SWAP){ pickSwapB(date); return; }
@@ -610,7 +627,8 @@ async function openHolidays(){
   }
   async function act(fn){ try{ await fn(); await draw(); }catch(e){ alert(e.message); } }
   $("hList").onclick = e=>{ const b=e.target.closest("button[data-a=del]"); if(!b) return;
-    const d=b.closest(".r").dataset.d; if(confirm(d+" 삭제할까요?")) act(()=>admin("holiday_delete",{dates:[d]})); };
+    const d=b.closest(".r").dataset.d, nm=b.closest(".r").querySelector(".nm").textContent.trim();
+    ask(`${nm} 휴일을 삭제할까요?`,{ok:"삭제",danger:true}).then(ok=>{ if(ok) act(()=>admin("holiday_delete",{dates:[d]})); }); };
   draw();
 }
 
