@@ -110,9 +110,26 @@ input:focus-visible,textarea:focus-visible{outline:2px solid var(--sat);outline-
 button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 button.danger{color:var(--sun)}
 button.sm{padding:3px 8px;font-size:12px}
-.edit-bar{display:none;gap:6px;align-items:center}
+.edit-bar{display:none}
 body.editing .edit-bar{display:flex}
 body.editing #editBtn{display:none}
+.edit-bar{position:fixed;z-index:5;background:var(--panel);border:1px solid var(--edge);border-radius:12px;box-shadow:0 6px 24px rgba(16,24,40,.12);padding:10px;gap:6px}
+.edit-bar button{border:0;background:none;color:var(--duty);font-weight:600;text-align:left;padding:8px 12px;border-radius:8px}
+.edit-bar button:hover{background:var(--today)}
+.edit-bar #exitBtn{color:var(--muted);font-weight:500}
+.edit-bar .eb-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;padding:2px 12px 6px}
+.edit-bar .eb-hint{font-size:12px;color:var(--muted);margin:4px 12px 2px;border-top:1px solid var(--line2);padding-top:8px}
+/* PC: 우측 세로 패널 */
+@media (min-width:641px){
+  .edit-bar{right:16px;top:50%;transform:translateY(-50%);flex-direction:column;min-width:150px}
+}
+/* 모바일: 하단 바 */
+@media (max-width:640px){
+  .edit-bar{left:0;right:0;bottom:0;border-radius:14px 14px 0 0;flex-direction:row;flex-wrap:wrap;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+  .edit-bar .eb-title,.edit-bar .eb-hint{display:none}
+  .edit-bar button{padding:8px 10px;font-size:13px}
+  body.editing .wrap{padding-bottom:80px}
+}
 body.role-team .admin-only{display:none}
 body.swapping .cell:not(.out):hover,body.swapping .row:hover{background:var(--hl)}
 .cell.swap-a,.row.swap-a{box-shadow:inset 0 0 0 2px var(--duty)}
@@ -131,7 +148,6 @@ table.notice .em{color:var(--duty);font-weight:600}
 .edit-bar button{border:0;background:none;color:var(--duty);font-weight:600}
 .edit-bar button:hover{background:var(--panel)}
 .edit-bar #exitBtn{color:var(--muted);font-weight:400;border-left:1px solid var(--edge);border-radius:0;padding-left:12px}
-body.role-team .edit-bar #exitBtn{border-left:0;padding-left:12px;border-radius:6px}
 body.editing .cell:not(.out),body.editing .row{cursor:pointer}
 body.editing .cell:not(.out):hover,body.editing .row:hover{background:var(--hover)}
 body.editing .cell.today:hover,body.editing .row.today:hover{background:var(--today)}
@@ -180,13 +196,6 @@ table.prev .chg td:last-child{font-weight:700}
     <button id="goToday">오늘</button>
     <button id="noticeBtn">근무 안내</button>
     <button id="editBtn">편집</button>
-    <div class="edit-bar">
-      <button id="bulkBtn" class="admin-only">일괄 입력</button>
-      <button id="memBtn" class="admin-only">인원 관리</button>
-      <button id="holBtn" class="admin-only">휴일 관리</button>
-      <button id="logBtn" class="admin-only">변경 이력</button>
-      <button id="exitBtn">편집 종료</button>
-    </div>
     <span class="sp"></span>
     <select id="filter" aria-label="이름 필터"></select>
     <div class="tabs" role="tablist">
@@ -201,6 +210,15 @@ table.prev .chg td:last-child{font-weight:700}
   <div class="list" id="list"></div>
   <p class="note" id="note"></p>
 </div>
+<aside class="edit-bar" aria-label="편집 도구">
+  <div class="eb-title"><span id="ebRole">편집 모드</span></div>
+  <button id="bulkBtn" class="admin-only">일괄 입력</button>
+  <button id="memBtn" class="admin-only">인원 관리</button>
+  <button id="holBtn" class="admin-only">휴일 관리</button>
+  <button id="logBtn" class="admin-only">변경 이력</button>
+  <p class="eb-hint">날짜를 누르면 <span id="ebWhat">수정</span></p>
+  <button id="exitBtn">편집 종료</button>
+</aside>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog"></div></div>
 
 <script>
@@ -354,7 +372,7 @@ async function admin(op, payload={}){
   if(!r.ok) throw new Error(d.error||("HTTP "+r.status));
   return d;
 }
-function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); if(!on) cancelSwap(); }
+function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); $("ebRole").textContent = ROLE==="team"?"팀 편집":"관리자 편집"; $("ebWhat").textContent = ROLE==="team"?"교환":"수정"; if(!on) cancelSwap(); }
 $("editBtn").onclick = ()=>{
   openModal(`<h3>편집 모드</h3>
     <div class="f"><label>비밀번호</label><input type="password" id="pwIn" autocomplete="current-password" inputmode="text"></div>
