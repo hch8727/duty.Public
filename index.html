@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>당직일정표 - IT전략부</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -13,7 +13,7 @@
   --bg:#f4f5f7;--panel:#fff;--ink:#1a1f2b;--muted:#6b7280;--line:#dfe3e8;--line2:#eceff3;--we:#fafbfc;--head:#f6f7f9;--hover:#f7f8fa;--edge:#c7d7f5;--meet-strong:#b45309;
   --duty:#2563eb;--meet:#f59e0b;--meet-ink:#4f5660;--hl:#fff1c2;
   --sun:#d9534f;--sat:#4c6ef5;--today:#eff4ff;
-  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#15171c;--panel:#1d2026;--ink:#ecedef;--muted:#9aa0ab;--line:#2d313a;
@@ -21,7 +21,6 @@
 :root[data-theme="dark"]{
   --bg:#15171c;--panel:#1d2026;--ink:#ecedef;--muted:#9aa0ab;--line:#2d313a;
   --line2:#262a32;--we:#1a1d23;--head:#1a1d23;--hover:#262a32;--edge:#2d3a5c;--meet-strong:#f0b44c;--duty:#6b9cff;--meet:#f0b44c;--meet-ink:#b6bcc6;--hl:#3d3418;--sun:#f08a7e;--sat:#9bb6ee;--today:#1e2740;}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;line-height:1.5}
 .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 40px}
@@ -129,11 +128,11 @@ body.editing #editBtn{display:none}
 }
 /* 모바일: 하단 고정 바 */
 @media (max-width:640px){
-  .edit-bar{position:fixed;z-index:5;left:0;right:0;bottom:0;border-radius:0;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(16,24,40,.08);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));gap:0}
+  .edit-bar{position:fixed;z-index:5;left:0;right:0;bottom:0;border-radius:0;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(16,24,40,.08);padding:6px 4px;gap:0}
   .edit-bar button{flex:1;padding:10px 4px;font-size:13px;text-align:center;border-radius:0}
   .edit-bar #exitBtn{border:0;margin:0;background:none}
   .edit-bar #editBtn{flex:none;margin:0 auto;padding:8px 28px;background:none;border:0;border-radius:0}
-  .wrap{padding-bottom:72px}
+  .wrap{padding-bottom:64px}
 }
 body.role-team .admin-only{display:none}
 body.swapping .cell:not(.out):hover,body.swapping .row:hover{background:var(--hl)}
