@@ -206,6 +206,7 @@ table.prev .chg td:last-child{font-weight:700}
       <button id="memBtn" class="admin-only editing-only">인원 관리</button>
       <button id="holBtn" class="admin-only editing-only">휴일 관리</button>
       <button id="logBtn" class="admin-only editing-only">변경 이력</button>
+      <button id="csvBtn" class="admin-only editing-only">내보내기</button>
       <button id="exitBtn" class="editing-only">편집 종료</button>
     </aside>
   </section>
@@ -494,6 +495,33 @@ $("noticeBtn").onclick = ()=>{
     </table>
     <div class="actions"><span class="sp"></span><button id="nClose">닫기</button></div>`, true);
   $("nClose").onclick = closeModal;
+};
+
+/* CSV 내보내기 */
+$("csvBtn").onclick = ()=>{
+  const y=cur.getFullYear(), m=cur.getMonth();
+  openModal(`<h3>내보내기</h3>
+    <div class="f"><label>기간</label><span><input type="date" id="cFrom" value="${y}-${pad(m+1)}-01"> ~ <input type="date" id="cTo" value="${ymd(new Date(y,m+1,0))}"></span></div>
+    <div class="f"><label>옵션</label><label><input type="checkbox" id="cAll" checked> 배정 없는 날도 포함</label></div>
+    <div class="actions"><span class="hint" style="margin:0">엑셀에서 바로 열리는 CSV</span><span class="sp"></span><button id="cCancel">취소</button><button class="pri" id="cGo">다운로드</button></div>`);
+  $("cCancel").onclick = closeModal;
+  $("cGo").onclick = async ()=>{
+    const from=$("cFrom").value, to=$("cTo").value; if(!from||!to||from>to){ alert("기간을 확인하세요"); return; }
+    $("cGo").disabled=true;
+    try{
+      const {data,error} = await sb.from("duty").select("date,duty,meeting,note").gte("date",from).lte("date",to).order("date");
+      if(error) throw error;
+      const by=Object.fromEntries((data||[]).map(r=>[r.date,r])), out=[["날짜","요일","당직","회의 참석","특이사항","휴일"]];
+      for(let d=new Date(from+"T00:00"); ymd(d)<=to; d.setDate(d.getDate()+1)){
+        const k=ymd(d), r=by[k];
+        if(!r && !$("cAll").checked) continue;
+        out.push([k, WD[d.getDay()], r?.duty||"", r?.meeting||"", r?.note||"", HOLIDAY[k]||""]);
+      }
+      const csv="\uFEFF"+out.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+      const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+      a.download=`당직표_${from}_${to}.csv`; a.click(); URL.revokeObjectURL(a.href); closeModal();
+    }catch(e){ alert("실패: "+e.message); $("cGo").disabled=false; }
+  };
 };
 
 /* 변경 이력 */
