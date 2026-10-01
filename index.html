@@ -114,14 +114,12 @@ button.sm{padding:3px 8px;font-size:12px}
 .edit-bar{display:flex;gap:4px;align-items:center}
 .editing-only{display:none}
 body.editing .editing-only{display:inline-flex}
-body.editing .eb-title{display:inline}
 body.editing #editBtn{display:none}
 #editBtn{color:var(--duty);border:1px solid var(--duty);background:var(--today);font-weight:600;padding:7px 14px;border-radius:8px}
 #editBtn:hover{background:var(--duty);color:#fff}
 .edit-bar button{border:0;background:none;color:var(--duty);font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
 .edit-bar button:hover{background:var(--today)}
 .edit-bar #exitBtn{color:var(--muted);font-weight:500}
-.edit-bar .eb-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;white-space:nowrap;margin-right:4px}
 /* PC: 오늘 박스 우측 */
 @media (min-width:641px){
   .edit-bar{margin-left:auto;padding-left:16px;border-left:1px solid var(--line)}
@@ -129,9 +127,8 @@ body.editing #editBtn{display:none}
 /* 모바일: 하단 고정 바 */
 @media (max-width:640px){
   .edit-bar{position:fixed;z-index:5;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(16,24,40,.08);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));gap:0}
-  .edit-bar .eb-title{display:none}
-  .edit-bar button{flex:1;padding:10px 4px;font-size:13px;text-align:center;border-radius:6px}
-  .edit-bar #editBtn{flex:none;margin:0 auto;padding:8px 28px;background:none;border:0}
+  .edit-bar button{flex:1;padding:10px 4px;font-size:13px;text-align:center;border-radius:0}
+  .edit-bar #editBtn{flex:none;margin:0 auto;padding:8px 28px;background:none;border:0;border-radius:0}
   .wrap{padding-bottom:72px}
 }
 body.role-team .admin-only{display:none}
@@ -198,7 +195,6 @@ table.prev .chg td:last-child{font-weight:700}
     <div class="today-in" id="todayBox"></div>
     <aside class="edit-bar" aria-label="편집 도구">
       <button id="editBtn">편집</button>
-      <span class="eb-title editing-only" id="ebRole">편집 모드</span>
       <button id="bulkBtn" class="admin-only editing-only">일괄 입력</button>
       <button id="memBtn" class="admin-only editing-only">인원 관리</button>
       <button id="holBtn" class="admin-only editing-only">휴일 관리</button>
@@ -378,7 +374,7 @@ async function admin(op, payload={}){
   if(!r.ok) throw new Error(d.error||("HTTP "+r.status));
   return d;
 }
-function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); $("ebRole").textContent = ROLE==="team"?"팀 편집":"관리자 편집"; if(!on) cancelSwap(); }
+function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); if(!on) cancelSwap(); }
 $("editBtn").onclick = ()=>{
   openModal(`<h3>편집 모드</h3>
     <div class="f"><label>비밀번호</label><input type="password" id="pwIn" autocomplete="current-password" inputmode="text"></div>
