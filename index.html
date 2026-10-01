@@ -27,7 +27,8 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard Vari
 .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 40px}
 
 /* 오늘 */
-.todaybox{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:18px 22px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.todaybox{display:flex;gap:20px;align-items:center;padding:18px 22px;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.today-in{display:flex;gap:28px;align-items:center;flex-wrap:wrap;flex:1;min-width:0}
 .todaybox .date{font-size:13px;color:var(--muted);min-width:120px;line-height:1.3}
 .todaybox .date b{display:block;font-size:20px;color:var(--ink);font-weight:800}
 .todaybox .who{display:flex;gap:28px;flex-wrap:wrap;padding-left:28px;border-left:1px solid var(--line)}
@@ -113,22 +114,21 @@ button.sm{padding:3px 8px;font-size:12px}
 .edit-bar{display:none}
 body.editing .edit-bar{display:flex}
 body.editing #editBtn{display:none}
-.edit-bar{position:fixed;z-index:5;background:var(--panel);border:1px solid var(--edge);border-radius:12px;box-shadow:0 6px 24px rgba(16,24,40,.12);padding:10px;gap:6px}
-.edit-bar button{border:0;background:none;color:var(--duty);font-weight:600;text-align:left;padding:8px 12px;border-radius:8px}
+.edit-bar{gap:4px;align-items:center}
+.edit-bar button{border:0;background:none;color:var(--duty);font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
 .edit-bar button:hover{background:var(--today)}
 .edit-bar #exitBtn{color:var(--muted);font-weight:500}
-.edit-bar .eb-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;padding:2px 12px 6px}
-.edit-bar .eb-hint{font-size:12px;color:var(--muted);margin:4px 12px 2px;border-top:1px solid var(--line2);padding-top:8px}
-/* PC: 우측 세로 패널 */
+.edit-bar .eb-title{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;white-space:nowrap;margin-right:4px}
+/* PC: 오늘 박스 우측 */
 @media (min-width:641px){
-  .edit-bar{right:16px;top:50%;transform:translateY(-50%);flex-direction:column;min-width:150px}
+  .edit-bar{margin-left:auto;padding-left:16px;border-left:1px solid var(--line)}
 }
-/* 모바일: 하단 바 */
+/* 모바일: 하단 고정 바 */
 @media (max-width:640px){
-  .edit-bar{left:0;right:0;bottom:0;border-radius:14px 14px 0 0;flex-direction:row;flex-wrap:wrap;justify-content:space-around;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px))}
-  .edit-bar .eb-title,.edit-bar .eb-hint{display:none}
-  .edit-bar button{padding:8px 10px;font-size:13px}
-  body.editing .wrap{padding-bottom:80px}
+  .edit-bar{position:fixed;z-index:5;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(16,24,40,.08);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));gap:0}
+  .edit-bar .eb-title{display:none}
+  .edit-bar button{flex:1;padding:10px 4px;font-size:13px;text-align:center;border-radius:6px}
+  body.editing .wrap{padding-bottom:72px}
 }
 body.role-team .admin-only{display:none}
 body.swapping .cell:not(.out):hover,body.swapping .row:hover{background:var(--hl)}
@@ -160,6 +160,8 @@ body.editing .cell.today:hover,body.editing .row.today:hover{background:var(--to
 .modal .f select,.modal .f input:not([type=checkbox]),.modal .f textarea{width:100%}
 .modal .f input[type=date]{width:auto}
 .modal .actions{display:flex;gap:8px;margin-top:16px;align-items:center}
+.modal .actions button{flex:none;white-space:nowrap}
+.modal .actions .hint{flex:1;min-width:0}
 .modal .actions .sp{flex:1}
 .hint{font-size:13px;color:var(--muted);margin:0 0 8px}
 table.prev{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
@@ -172,11 +174,12 @@ table.prev .chg td:last-child{font-weight:700}
 .mlist .r .bt{display:flex;gap:4px}
 @media (max-width:640px){
   .wrap{padding:10px 10px 32px}
-  .todaybox{padding:14px 16px;margin-bottom:14px;gap:12px}
+  .todaybox{padding:14px 16px;margin-bottom:14px}
   .cell{min-height:84px;padding:6px 6px;gap:4px}
   .cell .n i{min-width:20px;height:20px;font-size:13px}
   .cell .n{flex-wrap:wrap;gap:0 4px;align-items:flex-start}
   .cell .n em{width:100%;font-size:10px;line-height:1.3;margin-top:1px}
+  .today-in{gap:10px}
   .todaybox .who{padding-left:0;border-left:0;width:100%}
   .tag{font-size:12px;padding-left:7px}
   .cell .memo{display:none}
@@ -189,7 +192,17 @@ table.prev .chg td:last-child{font-weight:700}
 <div class="wrap">
   <div class="stale" id="stale"></div>
   <div class="swap-hint" id="swapHint"></div>
-  <section class="todaybox" id="todayBox"></section>
+  <section class="todaybox">
+    <div class="today-in" id="todayBox"></div>
+    <aside class="edit-bar" aria-label="편집 도구">
+      <span class="eb-title" id="ebRole">편집 모드</span>
+      <button id="bulkBtn" class="admin-only">일괄 입력</button>
+      <button id="memBtn" class="admin-only">인원 관리</button>
+      <button id="holBtn" class="admin-only">휴일 관리</button>
+      <button id="logBtn" class="admin-only">변경 이력</button>
+      <button id="exitBtn">편집 종료</button>
+    </aside>
+  </section>
 
   <div class="bar">
     <div class="nav"><button id="prev" aria-label="이전 달">‹</button><h1 id="title"></h1><button id="next" aria-label="다음 달">›</button></div>
@@ -210,15 +223,6 @@ table.prev .chg td:last-child{font-weight:700}
   <div class="list" id="list"></div>
   <p class="note" id="note"></p>
 </div>
-<aside class="edit-bar" aria-label="편집 도구">
-  <div class="eb-title"><span id="ebRole">편집 모드</span></div>
-  <button id="bulkBtn" class="admin-only">일괄 입력</button>
-  <button id="memBtn" class="admin-only">인원 관리</button>
-  <button id="holBtn" class="admin-only">휴일 관리</button>
-  <button id="logBtn" class="admin-only">변경 이력</button>
-  <p class="eb-hint">날짜를 누르면 <span id="ebWhat">수정</span></p>
-  <button id="exitBtn">편집 종료</button>
-</aside>
 <div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog"></div></div>
 
 <script>
@@ -372,7 +376,7 @@ async function admin(op, payload={}){
   if(!r.ok) throw new Error(d.error||("HTTP "+r.status));
   return d;
 }
-function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); $("ebRole").textContent = ROLE==="team"?"팀 편집":"관리자 편집"; $("ebWhat").textContent = ROLE==="team"?"교환":"수정"; if(!on) cancelSwap(); }
+function setEditing(on){ document.body.classList.toggle("editing",on); document.body.classList.toggle("role-team", on && ROLE==="team"); $("ebRole").textContent = ROLE==="team"?"팀 편집":"관리자 편집"; if(!on) cancelSwap(); }
 $("editBtn").onclick = ()=>{
   openModal(`<h3>편집 모드</h3>
     <div class="f"><label>비밀번호</label><input type="password" id="pwIn" autocomplete="current-password" inputmode="text"></div>
