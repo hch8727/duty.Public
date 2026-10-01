@@ -160,6 +160,9 @@ body.editing .cell.today:hover,body.editing .row.today:hover{background:var(--to
 .modal .f{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:center;margin-bottom:10px;font-size:14px}
 .modal .f select,.modal .f input:not([type=checkbox]),.modal .f textarea{width:100%}
 .modal .f input[type=date]{width:auto}
+.modal .f > span{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.modal .f > span > input:not([type=date]):not([type=checkbox]){flex:1;min-width:0;width:auto}
+.modal .f > span > button{flex:none;white-space:nowrap}
 .modal .f label label{display:inline-flex;align-items:center;gap:6px}
 .modal .f input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--duty)}
 .modal .actions{display:flex;gap:8px;margin-top:16px;align-items:center}
@@ -559,7 +562,7 @@ async function showPreview(items, over){
 $("memBtn").onclick = openMembers;
 async function openMembers(){
   openModal(`<h3>인원 관리</h3>
-    <div class="f"><label>추가</label><span style="display:flex;gap:6px"><input id="mNew" placeholder="이름"><button id="mAdd">추가</button></span></div>
+    <div class="f"><label>추가</label><span><input id="mNew" placeholder="이름"><button id="mAdd">추가</button></span></div>
     <div class="mlist" id="mList"></div>
     <div class="actions"><span class="hint" style="margin:0">비활성 인원은 목록에서만 빠지고 지난 당직 기록은 그대로 남습니다.</span><span class="sp"></span><button id="mClose">닫기</button></div>`);
   $("mClose").onclick = ()=>{ closeModal(); refresh(); };
@@ -595,8 +598,8 @@ $("holBtn").onclick = openHolidays;
 async function openHolidays(){
   let year = cur.getFullYear();
   openModal(`<h3>휴일 관리</h3>
-    <div class="f"><label>연도</label><span style="display:flex;gap:6px;align-items:center"><button class="sm" id="hPrev">‹</button><b id="hYear">${year}</b><button class="sm" id="hNext">›</button></span></div>
-    <div class="f"><label>추가</label><span style="display:flex;gap:6px"><input type="date" id="hDate"><input id="hName" placeholder="이름 (예: 임시공휴일)" style="flex:1"><button id="hAdd">추가</button></span></div>
+    <div class="f"><label>연도</label><span><button class="sm" id="hPrev">‹</button><b id="hYear">${year}</b><button class="sm" id="hNext">›</button></span></div>
+    <div class="f"><label>추가</label><span><input type="date" id="hDate"><input id="hName" placeholder="휴일 이름"><button id="hAdd">추가</button></span></div>
     <div class="f"><label>붙여넣기</label><span><textarea id="hText" rows="3" style="width:100%"></textarea>
       <button class="sm" id="hPaste" style="margin-top:4px">일괄 추가</button></span></div>
     <div class="mlist" id="hList"></div>
