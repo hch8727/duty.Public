@@ -111,10 +111,13 @@ input:focus-visible,textarea:focus-visible{outline:2px solid var(--sat);outline-
 button.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 button.danger{color:var(--sun)}
 button.sm{padding:3px 8px;font-size:12px}
-.edit-bar{display:none}
-body.editing .edit-bar{display:flex}
+.edit-bar{display:flex;gap:4px;align-items:center}
+.editing-only{display:none}
+body.editing .editing-only{display:inline-flex}
+body.editing .eb-title{display:inline}
 body.editing #editBtn{display:none}
-.edit-bar{gap:4px;align-items:center}
+#editBtn{color:var(--duty);border:1px solid var(--duty);background:var(--today);font-weight:600;padding:7px 14px;border-radius:8px}
+#editBtn:hover{background:var(--duty);color:#fff}
 .edit-bar button{border:0;background:none;color:var(--duty);font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
 .edit-bar button:hover{background:var(--today)}
 .edit-bar #exitBtn{color:var(--muted);font-weight:500}
@@ -128,7 +131,8 @@ body.editing #editBtn{display:none}
   .edit-bar{position:fixed;z-index:5;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(16,24,40,.08);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));gap:0}
   .edit-bar .eb-title{display:none}
   .edit-bar button{flex:1;padding:10px 4px;font-size:13px;text-align:center;border-radius:6px}
-  body.editing .wrap{padding-bottom:72px}
+  .edit-bar #editBtn{flex:none;margin:0 auto;padding:8px 28px;background:none;border:0}
+  .wrap{padding-bottom:72px}
 }
 body.role-team .admin-only{display:none}
 body.swapping .cell:not(.out):hover,body.swapping .row:hover{background:var(--hl)}
@@ -142,8 +146,6 @@ table.notice th,table.notice td{border:1px solid var(--line);padding:9px 12px;te
 table.notice th{background:var(--head);font-weight:600}
 table.notice td:first-child{background:var(--head);font-weight:600}
 table.notice .em{color:var(--duty);font-weight:600}
-#editBtn{color:var(--duty);border-color:var(--duty);background:var(--today)}
-#editBtn:hover{background:var(--duty);color:#fff}
 .edit-bar{background:var(--today);border:1px solid var(--edge);border-radius:8px;padding:3px 4px}
 .edit-bar button{border:0;background:none;color:var(--duty);font-weight:600}
 .edit-bar button:hover{background:var(--panel)}
@@ -195,12 +197,13 @@ table.prev .chg td:last-child{font-weight:700}
   <section class="todaybox">
     <div class="today-in" id="todayBox"></div>
     <aside class="edit-bar" aria-label="편집 도구">
-      <span class="eb-title" id="ebRole">편집 모드</span>
-      <button id="bulkBtn" class="admin-only">일괄 입력</button>
-      <button id="memBtn" class="admin-only">인원 관리</button>
-      <button id="holBtn" class="admin-only">휴일 관리</button>
-      <button id="logBtn" class="admin-only">변경 이력</button>
-      <button id="exitBtn">편집 종료</button>
+      <button id="editBtn">편집</button>
+      <span class="eb-title editing-only" id="ebRole">편집 모드</span>
+      <button id="bulkBtn" class="admin-only editing-only">일괄 입력</button>
+      <button id="memBtn" class="admin-only editing-only">인원 관리</button>
+      <button id="holBtn" class="admin-only editing-only">휴일 관리</button>
+      <button id="logBtn" class="admin-only editing-only">변경 이력</button>
+      <button id="exitBtn" class="editing-only">편집 종료</button>
     </aside>
   </section>
 
@@ -208,7 +211,6 @@ table.prev .chg td:last-child{font-weight:700}
     <div class="nav"><button id="prev" aria-label="이전 달">‹</button><h1 id="title"></h1><button id="next" aria-label="다음 달">›</button></div>
     <button id="goToday">오늘</button>
     <button id="noticeBtn">근무 안내</button>
-    <button id="editBtn">편집</button>
     <span class="sp"></span>
     <select id="filter" aria-label="이름 필터"></select>
     <div class="tabs" role="tablist">
